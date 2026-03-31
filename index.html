@@ -3,17 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz: Educação Física</title>
-    <link rel="stylesheet" href="style.css">
-    <script type="module" src="app.js" defer></script>
+    <title>Quiz: Introdução à Educação Física</title>
+    <style>
+        /* Estilos integrados para facilitar no celular */
+        * { box-sizing: border-box; font-family: sans-serif; }
+        body { background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; margin: 0; min-height: 100vh; }
+        .container { background: white; padding: 20px; border-radius: 15px; shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; height: fit-content; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+        h1 { color: #1a73e8; font-size: 1.5rem; }
+        input { width: 100%; padding: 12px; margin: 20px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+        button { background-color: #1a73e8; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+        button:active { transform: scale(0.98); background-color: #1557b0; }
+        .option-btn { background-color: #f8f9fa; color: #333; border: 1px solid #ddd; text-align: left; font-weight: normal; }
+        .header { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 14px; color: #666; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        #leaderboard-list { list-style: none; padding: 0; text-align: left; }
+        #leaderboard-list li { padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+        .finish-area { margin-top: 20px; border-top: 2px solid #eee; padding-top: 15px; }
+    </style>
 </head>
 <body>
+
     <div class="container">
         <div id="login-screen" class="screen active">
-            <h1>Desafio de Educação Física</h1>
-            <p>Teste seus conhecimentos e suba no ranking!</p>
-            <input type="text" id="username" placeholder="Digite seu nome para começar..." autocomplete="off">
-            <button id="start-btn">Começar Jogo</button>
+            <h1>🎓 Quiz de Ed. Física</h1>
+            <p>Insira seu nome para entrar no ranking:</p>
+            <input type="text" id="username" placeholder="Seu nome aqui..." autocomplete="off">
+            <button onclick="startGame()">ENTRAR NO JOGO</button>
         </div>
 
         <div id="game-screen" class="screen">
@@ -21,19 +37,26 @@
                 <span id="player-name">Jogador</span>
                 <span id="score-display">Pontos: 0</span>
             </div>
-            <div class="question-container">
+            <div id="quiz-area">
                 <h2 id="question-text">Carregando pergunta...</h2>
                 <div id="options-container"></div>
             </div>
-            <button id="next-btn" class="hidden">Próxima Pergunta</button>
-            <button id="finish-btn">Encerrar e Ver Ranking</button>
+            <div class="finish-area">
+                <button onclick="finishGame()" style="background-color: #dc3545;">PARAR E VER RANKING</button>
+            </div>
         </div>
 
         <div id="leaderboard-screen" class="screen">
-            <h2>🏆 Ranking Global 🏆</h2>
+            <h2>🏆 Top 10 Alunos</h2>
             <ul id="leaderboard-list"></ul>
-            <button id="restart-btn">Jogar Novamente</button>
+            <button onclick="restartGame()" style="background-color: #28a745;">JOGAR NOVAMENTE</button>
         </div>
     </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+    <script src="app.js"></script>
+
 </body>
 </html>

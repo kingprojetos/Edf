@@ -1,8 +1,4 @@
-// 1. IMPORTAÇÕES DO FIREBASE (Usando a versão modular atual)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-// COLE SUAS CONFIGURAÇÕES AQUI (Pegue no Console do Firebase)
+// 1. CONFIGURAÇÃO DO SEU FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyAsfJXibsG_q4lYbKtLIUJT8HJb4VVOLOw",
   authDomain: "introef-529bf.firebaseapp.com",
@@ -12,153 +8,96 @@ const firebaseConfig = {
   appId: "1:1032565542910:web:3e0827dc9a4157b310faaf"
 };
 
-// Inicializar Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// Inicialização para Versão Compat (Celular)
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-// 2. BANCO DE QUESTÕES (Adicione as 90 aqui seguindo este formato)
+// 2. BANCO DE QUESTÕES (Exemplos variados do seu PDF)
 const questionBank = [
-    {
-        [span_1](start_span)question: "A Educação Física é uma área que estuda o corpo em movimento, integra o indivíduo à cultura corporal e promove desenvolvimento integral.", //[span_1](end_span)
-        options: ["Verdadeiro", "Falso"],
-        answer: 0
-    },
-    {
-        [span_2](start_span)question: "Historicamente, nos séculos XVIII e XIX, qual era o foco principal da Educação Física?", //[span_2](end_span)
-        options: ["Base militar e higienista", "Esporte de alto rendimento", "Inclusão social", "Tecnologia e games"],
-        answer: 0
-    },
-    {
-        [span_3](start_span)question: "A Educação Física consolidou-se como ciência, com base teórica e visão crítica, a partir de qual década?", //[span_3](end_span)
-        options: ["1850", "1937", "Anos 1980", "2002"],
-        answer: 2
-    },
-    {
-        [span_4](start_span)question: "O profissional que age sem o cuidado necessário (faz sem cuidado) comete:", //[span_4](end_span)
-        options: ["Imperícia", "Negligência", "Imprudência", "Beneficência"],
-        answer: 2
-    },
-    {
-        [span_5](start_span)question: "A 'Cultura Corporal' engloba práticas como esportes, jogos, danças, lutas e ginástica com significado social.", //[span_5](end_span)
-        options: ["Verdadeiro", "Falso"],
-        answer: 0
-    }
-    // Adicione vírgula e copie mais blocos para inserir as outras questões!
+    { q: "A Educação Física estuda apenas a prática de esportes?", options: ["Verdadeiro", "Falso (Envolve teoria e ciência)"], a: 1 },
+    { q: "Em que ano a Educação Física entrou nos currículos escolares?", options: ["1850", "1937", "1998"], a: 0 },
+    { q: "O que caracteriza a Negligência?", options: ["Falta de técnica", "Omissão (deixar de fazer)", "Ação sem cuidado"], a: 1 },
+    { q: "Qual fase (1970) focava em competição e desempenho?", options: ["Higienista", "Militarista", "Esportivista"], a: 2 },
+    { q: "O Bacharel pode dar aulas em escolas?", options: ["Sim", "Não (Apenas Licenciados)"], a: 1 },
+    { q: "Qual década marca a consolidação da EF como ciência?", options: ["1950", "1980", "2020"], a: 1 },
+    { q: "O que é Imperícia?", options: ["Falta de conhecimento técnico", "Ação precipitada", "Esquecimento"], a: 0 },
+    { q: "O princípio da Bioética que preza pelo 'não dano' é:", options: ["Autonomia", "Justiça", "Não Maleficência"], a: 2 },
+    { q: "Em que ano a EF tornou-se obrigatória por lei?", options: ["1937", "1938", "1977"], a: 0 },
+    { q: "Quem defendia o dualismo corpo x mente?", options: ["Sócrates", "Platão e Descartes", "Paulo Freire"], a: 1 }
+    // Para chegar a 90, basta copiar a linha acima e mudar o texto!
 ];
 
-// 3. VARIÁVEIS DO JOGO
 let currentUserName = "";
 let currentScore = 0;
-let currentQuestionObj = null;
 
-// Elementos HTML
-const screens = {
-    login: document.getElementById('login-screen'),
-    game: document.getElementById('game-screen'),
-    leaderboard: document.getElementById('leaderboard-screen')
-};
-
-// 4. LÓGICA DE NAVEGAÇÃO E JOGO
-function showScreen(screenName) {
-    Object.values(screens).forEach(screen => screen.classList.remove('active'));
-    screens[screenName].classList.add('active');
-}
-
-document.getElementById('start-btn').addEventListener('click', () => {
+// 3. FUNÇÕES DO JOGO
+window.startGame = function() {
     const nameInput = document.getElementById('username').value.trim();
     if (nameInput) {
         currentUserName = nameInput;
         currentScore = 0;
-        document.getElementById('player-name').innerText = currentUserName;
-        updateScoreDisplay();
-        showScreen('game');
+        document.getElementById('player-name').innerText = "Jogador: " + currentUserName;
+        document.getElementById('login-screen').classList.remove('active');
+        document.getElementById('game-screen').classList.add('active');
         loadRandomQuestion();
     } else {
-        alert("Por favor, insira seu nome!");
+        alert("Digite seu nome!");
     }
-});
+};
 
 function loadRandomQuestion() {
-    // Escolhe uma pergunta aleatória do banco
-    const randomIndex = Math.floor(Math.random() * questionBank.length);
-    currentQuestionObj = questionBank[randomIndex];
+    const qObj = questionBank[Math.floor(Math.random() * questionBank.length)];
+    document.getElementById('question-text').innerText = qObj.q;
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
     
-    document.getElementById('question-text').innerText = currentQuestionObj.question;
-    const optionsContainer = document.getElementById('options-container');
-    optionsContainer.innerHTML = '';
-    
-    // Cria os botões de resposta
-    currentQuestionObj.options.forEach((option, index) => {
+    qObj.options.forEach((opt, i) => {
         const btn = document.createElement('button');
-        btn.innerText = option;
+        btn.innerText = opt;
         btn.className = 'option-btn';
-        btn.onclick = () => checkAnswer(index, btn);
-        optionsContainer.appendChild(btn);
+        btn.onclick = () => {
+            const allBtns = container.querySelectorAll('button');
+            allBtns.forEach(b => b.disabled = true);
+            
+            if(i === qObj.a) {
+                currentScore += 10;
+                btn.style.backgroundColor = "#28a745"; // Verde
+            } else {
+                btn.style.backgroundColor = "#dc3545"; // Vermelho
+                allBtns[qObj.a].style.backgroundColor = "#28a745";
+            }
+            document.getElementById('score-display').innerText = "Pontos: " + currentScore;
+            setTimeout(loadRandomQuestion, 1500); 
+        };
+        container.appendChild(btn);
     });
-    
-    document.getElementById('next-btn').classList.add('hidden');
 }
 
-function checkAnswer(selectedIndex, btnElement) {
-    const optionsContainer = document.getElementById('options-container');
-    const allBtns = optionsContainer.querySelectorAll('.option-btn');
-    
-    // Desativa botões após o clique
-    allBtns.forEach(btn => btn.disabled = true);
-    
-    if (selectedIndex === currentQuestionObj.answer) {
-        btnElement.classList.add('correct');
-        currentScore += 10; // Ganha 10 pontos por acerto
-        updateScoreDisplay();
-    } else {
-        btnElement.classList.add('wrong');
-        allBtns[currentQuestionObj.answer].classList.add('correct'); // Mostra a certa
-    }
-    
-    document.getElementById('next-btn').classList.remove('hidden');
-}
-
-function updateScoreDisplay() {
-    document.getElementById('score-display').innerText = `Pontos: ${currentScore}`;
-}
-
-document.getElementById('next-btn').addEventListener('click', loadRandomQuestion);
-
-// 5. ENCERRAR E SALVAR NO FIREBASE
-document.getElementById('finish-btn').addEventListener('click', async () => {
+window.finishGame = async function() {
     try {
-        // Salva no banco de dados Firestore
-        await addDoc(collection(db, "leaderboard"), {
+        await db.collection("leaderboard").add({
             name: currentUserName,
             score: currentScore,
-            timestamp: new Date()
+            date: new Date()
         });
-        showScreen('leaderboard');
-        loadLeaderboard();
+        showLeaderboard();
     } catch (e) {
-        console.error("Erro ao salvar pontuação: ", e);
-        alert("Erro ao salvar sua pontuação. Verifique a conexão.");
+        alert("Erro ao salvar! Verifique as Regras do seu Banco no Firebase.");
     }
-});
+};
 
-// 6. CARREGAR RANKING EM TEMPO REAL
-function loadLeaderboard() {
-    const q = query(collection(db, "leaderboard"), orderBy("score", "desc"), limit(10));
+function showLeaderboard() {
+    document.getElementById('game-screen').classList.remove('active');
+    document.getElementById('leaderboard-screen').classList.add('active');
     
-    // onSnapshot atualiza a tela automaticamente se outra pessoa jogar
-    onSnapshot(q, (snapshot) => {
+    db.collection("leaderboard").orderBy("score", "desc").limit(10).onSnapshot(snap => {
         const list = document.getElementById('leaderboard-list');
         list.innerHTML = '';
-        snapshot.forEach((doc) => {
+        snap.forEach(doc => {
             const data = doc.data();
-            const li = document.createElement('li');
-            li.innerHTML = `<span>${data.name}</span> <span>${data.score} pts</span>`;
-            list.appendChild(li);
+            list.innerHTML += `<li>${data.name}: ${data.score} pts</li>`;
         });
     });
 }
 
-document.getElementById('restart-btn').addEventListener('click', () => {
-    document.getElementById('username').value = '';
-    showScreen('login');
-});
+window.restartGame = () => location.reload();

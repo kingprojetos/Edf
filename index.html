@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Educação Física</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="app.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <div id="login-screen" class="screen active">
+            <h1>Desafio de Educação Física</h1>
+            <p>Teste seus conhecimentos e suba no ranking!</p>
+            <input type="text" id="username" placeholder="Digite seu nome para começar..." autocomplete="off">
+            <button id="start-btn">Começar Jogo</button>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <div class="header">
+                <span id="player-name">Jogador</span>
+                <span id="score-display">Pontos: 0</span>
+            </div>
+            <div class="question-container">
+                <h2 id="question-text">Carregando pergunta...</h2>
+                <div id="options-container"></div>
+            </div>
+            <button id="next-btn" class="hidden">Próxima Pergunta</button>
+            <button id="finish-btn">Encerrar e Ver Ranking</button>
+        </div>
+
+        <div id="leaderboard-screen" class="screen">
+            <h2>🏆 Ranking Global 🏆</h2>
+            <ul id="leaderboard-list"></ul>
+            <button id="restart-btn">Jogar Novamente</button>
+        </div>
+    </div>
+</body>
+</html>
